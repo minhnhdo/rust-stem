@@ -11,7 +11,7 @@ Porter's stemmer for rust
    make
    ```
 
-2. Example program
+2. Example code
    ```rust
    use stem::*;
    let word = "pencils";
