@@ -1,4 +1,3 @@
-use std::bool;
 use std::ascii;
 
 
@@ -26,7 +25,7 @@ pub struct Stemmer {
 
 impl Stemmer {
     pub fn new(word: &str) -> Result<Stemmer, ~str> {
-        if bool::not(word.is_ascii()) {
+        if !word.is_ascii() {
             Err(~"Only support English words with ASCII characters")
         } else {
             let b = unsafe { word.to_ascii_nocheck().to_lower() };
@@ -46,7 +45,7 @@ impl Stemmer {
             'y' => if i == 0 {
                 true
             } else {
-                bool::not(self.is_consonant(i - 1))
+                !self.is_consonant(i - 1)
             },
             _ => true,
         }
@@ -69,7 +68,7 @@ impl Stemmer {
         let j = self.j;
         loop {
             if i >= j { return n }
-            if bool::not(self.is_consonant(i)) { break }
+            if !self.is_consonant(i) { break }
             i += 1;
         }
         i += 1;
@@ -83,7 +82,7 @@ impl Stemmer {
             n += 1;
             loop {
                 if i >= j { return n }
-                if bool::not(self.is_consonant(i)) { break }
+                if !self.is_consonant(i) { break }
                 i += 1;
             }
             i += 1;
@@ -93,7 +92,7 @@ impl Stemmer {
     /// stem.has_vowel() is TRUE <=> [0, j-1) contains a vowel
     pub fn has_vowel(&self) -> bool {
         for i in range(0, self.j) {
-            if bool::not(self.is_consonant(i)) {
+            if !self.is_consonant(i) {
                 return true;
             }
         }
@@ -355,7 +354,7 @@ impl Stemmer {
        self.j = self.k;
        if self.b[self.k - 1].to_char() == 'e' {
            let a = self.measure();
-           if a > 1 || a == 1 && bool::not(self.cvc(self.k - 2)) { self.k -= 1 }
+           if a > 1 || a == 1 && !self.cvc(self.k - 2) { self.k -= 1 }
        }
        if self.b[self.k-1].to_char() == 'l'
            && self.double_consonant(self.k-1) && self.measure() > 1 {
