@@ -1,5 +1,11 @@
-use std::ascii;
+#[author = "Do Nhat Minh"];
+#[license = "MIT"];
 
+#[link(name="stem",
+       vers="0.1.0")];
+#[crate_type = "lib"];
+
+use std::ascii;
 
 /// Member b is a vector of std::ascii::Ascii holding a word to be stemmed.
 /// The letters are in b[0], b[1] ... ending at b[z->k]. Member k is readjusted

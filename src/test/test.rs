@@ -3,11 +3,10 @@ extern mod stem;
 use std::io;
 use std::path;
 
-use stem::*;
-
-fn main() {
-    match io::file_reader(&path::PosixPath("tests/voc.txt")) {
-        Ok(input) => match io::file_reader(&path::PosixPath("tests/output.txt")) {
+#[test]
+fn lexicon() {
+    match io::file_reader(&path::PosixPath("src/test/voc.txt")) {
+        Ok(input) => match io::file_reader(&path::PosixPath("src/test/output.txt")) {
             Ok(result) => {
                 do input.each_line |word| {
                     match stem::get(word) {
@@ -28,4 +27,5 @@ fn main() {
         },
         Err(e) => println(e),
     }
+    println("");
 }
