@@ -1,2 +1,6 @@
 *~
 *.so
+build/
+.rust/
+lib/
+bin/

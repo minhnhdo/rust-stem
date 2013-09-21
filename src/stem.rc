@@ -1,8 +1,0 @@
-#[author = "Do Nhat Minh"];
-#[license = "MIT"];
-
-#[link(name="stem",
-       vers="0.1.0")];
-#[crate_type = "lib"];
-
-pub mod stem;
