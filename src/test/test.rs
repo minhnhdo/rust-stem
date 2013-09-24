@@ -13,12 +13,12 @@ fn lexicon() {
                         Ok(stem) => {
                             let answer = result.read_line();
                             if stem != answer {
-                                printfln!("\n[FAILED] '%s' != '%s'", stem, answer);
+                                println!("\n[FAILED] '{:s}' != '{:s}'", stem, answer);
                             } else {
                                 print(".");
                             }
                         },
-                        Err(e) => printfln!("\n[FAILED] Cannot get stem for '%s': %s", word, e),
+                        Err(e) => println!("\n[FAILED] Cannot get stem for '{:s}': {:s}", word, e),
                     }
                     true
                 };
