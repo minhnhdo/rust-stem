@@ -369,7 +369,8 @@ impl Stemmer {
     }
 
     pub fn get(&self) -> ~str {
-        self.b.slice_to(self.k).to_str_ascii()
+        let borrowed = self.b.slice_to(self.k);
+        borrowed.as_str_ascii().into_owned()
     }
 }
 
@@ -389,6 +390,6 @@ pub fn get(word: &str) -> Result<~str, ~str> {
             Err(e) => Err(e),
         }
     } else {
-        Ok(word.to_owned())
+        Ok(word.into_owned())
     }
 }
