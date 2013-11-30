@@ -1,7 +1,5 @@
-#[author = "Do Nhat Minh"];
-#[license = "MIT"];
-
-#[link(name="stem",
+#[link(package_id="stem",
+       name="stem",
        vers="0.1.0")];
 #[crate_type = "lib"];
 
@@ -30,7 +28,7 @@ pub struct Stemmer {
 }
 
 impl Stemmer {
-    pub fn new(word: &str) -> Result<Stemmer, ~str> {
+    pub fn init(word: &str) -> Result<Stemmer, ~str> {
         if !word.is_ascii() {
             Err(~"Only support English words with ASCII characters")
         } else {
@@ -138,7 +136,7 @@ impl Stemmer {
         let k = self.k;
         if s[len - 1] != self.b[k-1].to_byte() { return false } /* tiny speed-up */
         if len > k { return false }
-        let mut iter = s.byte_iter();
+        let mut iter = s.bytes();
         for ac in self.b.slice(k - len, k).iter() {
             if ac.to_byte() != iter.next().unwrap() { return false }
         }
@@ -376,7 +374,7 @@ impl Stemmer {
 
 pub fn get(word: &str) -> Result<~str, ~str> {
     if word.len() > 2 {
-        match Stemmer::new(word) {
+        match Stemmer::init(word) {
             Ok(w) => {
                 let mut mw = w;
                 mw.step1ab();
