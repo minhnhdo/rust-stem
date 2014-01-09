@@ -1,6 +1,4 @@
-#[link(package_id="stem",
-       name="stem",
-       vers="0.1.0")];
+#[crate_id = "stem#0.1.0"];
 #[crate_type = "lib"];
 
 use std::ascii;
@@ -28,7 +26,7 @@ pub struct Stemmer {
 }
 
 impl Stemmer {
-    pub fn init(word: &str) -> Result<Stemmer, ~str> {
+    pub fn new(word: &str) -> Result<Stemmer, ~str> {
         if !word.is_ascii() {
             Err(~"Only support English words with ASCII characters")
         } else {
@@ -374,7 +372,7 @@ impl Stemmer {
 
 pub fn get(word: &str) -> Result<~str, ~str> {
     if word.len() > 2 {
-        match Stemmer::init(word) {
+        match Stemmer::new(word) {
             Ok(w) => {
                 let mut mw = w;
                 mw.step1ab();

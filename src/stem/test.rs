@@ -11,8 +11,8 @@ mod test {
 
     #[test]
     fn lexicon() {
-        match File::open(&path::Path::init("test-data/voc.txt")) {
-            Some(input) => match File::open(&path::Path::init("test-data/output.txt")) {
+        match File::open(&path::Path::new("test-data/voc.txt")) {
+            Some(input) => match File::open(&path::Path::new("test-data/output.txt")) {
                 Some(result) => {
                     let mut input_reader = BufferedReader::new(input);
                     let mut result_reader = BufferedReader::new(result);
