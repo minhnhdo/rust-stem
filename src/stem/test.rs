@@ -3,7 +3,7 @@ mod lib;
 #[cfg(test)]
 mod test {
     use std::io::File;
-    use std::io::buffered::BufferedReader;
+    use std::io::BufferedReader;
     use std::path;
     use lib::get;
 
@@ -24,7 +24,7 @@ mod test {
                                         Some(answer) => if answer.trim() != stem {
                                             println!("\n[FAILED] '{:s}' != '{:s}'", stem, answer);
                                         } else {
-                                            print(".");
+                                            print!(".");
                                         },
                                         None => break,
                                     }
@@ -39,6 +39,6 @@ mod test {
             },
             None => fail!("Error opening input file for testing."),
         }
-        println("");
+        println!("");
     }
 }
