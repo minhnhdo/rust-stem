@@ -3,7 +3,3 @@
 *.swp
 *.rlib
 /stem
-build/
-.rust/
-lib/
-bin/
