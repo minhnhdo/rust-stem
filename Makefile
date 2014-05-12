@@ -1,10 +1,10 @@
 lib:
 	rustc src/stem.rs
 
-test: lib
-	rustc -L . --test src/test.rs
+test:
+	rustc --test src/stem.rs
 
 clean:
-	$(RM) libstem*.rlib test
+	$(RM) libstem*.rlib stem
 
 .PHONY: lib test clean
