@@ -1,7 +1,9 @@
-#[crate_id = "stem#0.1.0"];
-#[crate_type = "lib"];
+#![crate_id = "stem#0.1.0"]
+#![crate_type = "lib"]
 
 use std::ascii;
+use std::ascii::Ascii;
+use std::vec::Vec;
 
 /// Member b is a vector of std::ascii::Ascii holding a word to be stemmed.
 /// The letters are in b[0], b[1] ... ending at b[z->k]. Member k is readjusted
@@ -20,15 +22,15 @@ use std::ascii;
 ///            will be "pencil" (the 's' is removed). -/
 ///
 pub struct Stemmer {
-    priv b: ~[ascii::Ascii],
-    priv k: uint,
-    priv j: uint,
+    b: Vec<ascii::Ascii>,
+    k: uint,
+    j: uint,
 }
 
 impl Stemmer {
     pub fn new(word: &str) -> Result<Stemmer, ~str> {
         if !word.is_ascii() {
-            Err(~"Only support English words with ASCII characters")
+            Err("Only support English words with ASCII characters".to_owned())
         } else {
             let b = unsafe { word.to_ascii_nocheck().to_lower() };
             let k = b.len();
@@ -42,7 +44,7 @@ impl Stemmer {
 
     /// stem.is_consonant(i) is true <=> stem[i] is a consonant
     pub fn is_consonant(&self, i: uint) -> bool {
-        match self.b[i].to_char() {
+        match self.b.get(i).to_char() {
             'a' | 'e' | 'i' | 'o' | 'u' => false,
             'y' => if i == 0 {
                 true
@@ -105,7 +107,7 @@ impl Stemmer {
     pub fn double_consonant(&self, i: uint) -> bool {
         if i < 1 {
             false
-        } else if self.b[i] != self.b[i - 1] {
+        } else if self.b.get(i) != self.b.get(i - 1) {
             false
         } else {
             self.is_consonant(i)
@@ -122,7 +124,7 @@ impl Stemmer {
     pub fn cvc(&self, i: uint) -> bool {
         if i < 2 || !self.is_consonant(i) || self.is_consonant(i - 1)
             || !self.is_consonant(i - 2) { return false }
-        match self.b[i].to_char() {
+        match self.b.get(i).to_char() {
             'w' | 'x' | 'y' => false,
             _ => true,
         }
@@ -132,7 +134,7 @@ impl Stemmer {
     pub fn ends(&mut self, s: &str) -> bool {
         let len = s.len();
         let k = self.k;
-        if s[len - 1] != self.b[k-1].to_byte() { return false } /* tiny speed-up */
+        if s[len - 1] != self.b.get(k-1).to_byte() { return false } /* tiny speed-up */
         if len > k { return false }
         let mut iter = s.bytes();
         for ac in self.b.slice(k - len, k).iter() {
@@ -148,7 +150,7 @@ impl Stemmer {
         let length = s.len();
         let j = self.j;
         for i in range(0, length) {
-            self.b[j + i] = s[i].to_ascii();
+            *self.b.get_mut(j + i) = s[i].to_ascii();
         }
         self.k = j + length;
     }
@@ -181,12 +183,12 @@ impl Stemmer {
     ///     meetings  ->  meet
     ///
     pub fn step1ab(&mut self) {
-        if self.b[self.k - 1].to_char() == 's' {
+        if self.b.get(self.k - 1).to_char() == 's' {
             if self.ends("sses") {
                 self.k -= 2;
             } else if self.ends("ies") {
                 self.set_to("i");
-            } else if self.b[self.k - 2].to_char() != 's' {
+            } else if self.b.get(self.k - 2).to_char() != 's' {
                 self.k -= 1;
             }
         }
@@ -202,7 +204,7 @@ impl Stemmer {
                 self.set_to("ize");
             } else if self.double_consonant(self.k - 1) {
                 self.k -= 1;
-                match self.b[self.k - 1].to_char() {
+                match self.b.get(self.k - 1).to_char() {
                     'l' | 's' | 'z' => self.k += 1,
                     _ => (),
                 }
@@ -215,7 +217,7 @@ impl Stemmer {
     /// stem.step1c() turns terminal y to i when there is another vowel in the stem.
     pub fn step1c(&mut self) {
        if self.ends("y") && self.has_vowel() {
-           self.b[self.k-1] = 'i'.to_ascii();
+           *self.b.get_mut(self.k-1) = 'i'.to_ascii();
         }
     }
 
@@ -223,7 +225,7 @@ impl Stemmer {
     /// plus -ation) maps to -ize etc. note that the string before the suffix
     /// must give m(z) > 0.
     pub fn step2(&mut self) {
-        match self.b[self.k-2].to_char() {
+        match self.b.get(self.k-2).to_char() {
             'a' => {
                 if self.ends("ational") { self.r("ate"); return }
                 if self.ends("tional") { self.r("tion"); return }
@@ -269,7 +271,7 @@ impl Stemmer {
 
     /// stem.step3() deals with -ic-, -full, -ness etc. similar strategy to step2.
     pub fn step3(&mut self) {
-        match self.b[self.k-1].to_char() {
+        match self.b.get(self.k-1).to_char() {
             'e' => {
                 if self.ends("icate") { self.r("ic"); return }
                 if self.ends("ative") { self.r(""); return }
@@ -287,7 +289,7 @@ impl Stemmer {
 
     /// stem.step4() takes off -ant, -ence etc., in context <c>vcvc<v>.
     pub fn step4(&mut self) {
-        match self.b[self.k-2].to_char() {
+        match self.b.get(self.k-2).to_char() {
             'a' => {
                 if self.ends("al") {}
                 else { return }
@@ -319,7 +321,7 @@ impl Stemmer {
             },
             'o' => {
                 if self.ends("ion")
-                    && (self.b[self.j-1].to_char() == 's' || self.b[self.j-1].to_char() == 't') {}
+                    && (self.b.get(self.j-1).to_char() == 's' || self.b.get(self.j-1).to_char() == 't') {}
                 else if self.ends("ou") {}
                 else { return }
                 /* takes care of -ous */
@@ -354,11 +356,11 @@ impl Stemmer {
     /// to -l if self.measure() > 1.
     pub fn step5(&mut self) {
        self.j = self.k;
-       if self.b[self.k - 1].to_char() == 'e' {
+       if self.b.get(self.k - 1).to_char() == 'e' {
            let a = self.measure();
            if a > 1 || a == 1 && !self.cvc(self.k - 2) { self.k -= 1 }
        }
-       if self.b[self.k-1].to_char() == 'l'
+       if self.b.get(self.k-1).to_char() == 'l'
            && self.double_consonant(self.k-1) && self.measure() > 1 {
            self.k-=1;
        }
