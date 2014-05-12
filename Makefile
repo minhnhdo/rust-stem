@@ -4,4 +4,7 @@ lib:
 test: lib
 	rustc -L . --test src/test.rs
 
-.PHONY: lib test
+clean:
+	$(RM) libstem*.rlib test
+
+.PHONY: lib test clean
