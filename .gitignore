@@ -1,6 +1,7 @@
 *~
 *.so
 *.swp
+*.rlib
 build/
 .rust/
 lib/
