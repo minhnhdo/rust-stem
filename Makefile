@@ -1,10 +1,21 @@
-lib:
-	rustc src/stem.rs
+RUSTC ?= rustc
 
-test:
-	rustc --test src/stem.rs
+SRC = src/stem.rs
+
+LIBNAME = $(shell $(RUSTC) --crate-file-name $(SRC))
+TESTNAME = $(shell $(RUSTC) --test --crate-file-name $(SRC))
+
+lib: $(LIBNAME)
+
+$(LIBNAME):
+	$(RUSTC) $(SRC)
+
+test: $(TESTNAME)
+
+$(TESTNAME):
+	$(RUSTC) --test $(SRC)
 
 clean:
-	$(RM) libstem*.rlib stem
+	$(RM) $(LIBNAME) $(TESTNAME)
 
 .PHONY: lib test clean
