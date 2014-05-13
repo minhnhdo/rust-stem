@@ -2,12 +2,12 @@ RUSTC ?= rustc
 
 SRC = src/stem.rs
 
-LIBNAME = $(shell $(RUSTC) --crate-file-name $(SRC))
+TARGET = $(shell $(RUSTC) --crate-file-name $(SRC))
 TESTNAME = $(shell $(RUSTC) --test --crate-file-name $(SRC))
 
-lib: $(LIBNAME)
+target: $(TARGET)
 
-$(LIBNAME):
+$(TARGET):
 	$(RUSTC) $(SRC)
 
 test: $(TESTNAME)
@@ -16,6 +16,6 @@ $(TESTNAME):
 	$(RUSTC) --test $(SRC)
 
 clean:
-	$(RM) $(LIBNAME) $(TESTNAME)
+	$(RM) $(TARGET) $(TESTNAME)
 
-.PHONY: lib test clean
+.PHONY: target test clean
