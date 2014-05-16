@@ -3,7 +3,7 @@ RUSTC ?= rustc
 SRC = src/stem.rs
 
 TARGET = $(shell $(RUSTC) --crate-file-name $(SRC))
-TESTNAME = $(shell $(RUSTC) --test --crate-file-name $(SRC))
+TESTNAME = $(shell $(RUSTC) --test --crate-file-name $(SRC))_test
 
 target: $(TARGET)
 
@@ -13,7 +13,7 @@ $(TARGET):
 test: $(TESTNAME)
 
 $(TESTNAME):
-	$(RUSTC) --test $(SRC)
+	$(RUSTC) -o $@ --test $(SRC)
 
 clean:
 	$(RM) $(TARGET) $(TESTNAME)
