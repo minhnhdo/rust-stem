@@ -2,4 +2,4 @@
 *.so
 *.swp
 *.rlib
-/stem
+/stem_test
