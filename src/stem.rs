@@ -28,9 +28,9 @@ pub struct Stemmer {
 }
 
 impl Stemmer {
-    pub fn new(word: &str) -> Result<Stemmer, ~str> {
+    pub fn new(word: &str) -> Result<Stemmer, &str> {
         if !word.is_ascii() {
-            Err("Only support English words with ASCII characters".to_owned())
+            Err("Only support English words with ASCII characters")
         } else {
             let b = unsafe { word.to_ascii_nocheck().to_lower() };
             let k = b.len();
@@ -366,13 +366,13 @@ impl Stemmer {
        }
     }
 
-    pub fn get(&self) -> ~str {
+    pub fn get(&self) -> String {
         let borrowed = self.b.slice_to(self.k);
-        borrowed.as_str_ascii().into_owned()
+        borrowed.as_str_ascii().into_string()
     }
 }
 
-pub fn get(word: &str) -> Result<~str, ~str> {
+pub fn get(word: &str) -> Result<String, &str> {
     if word.len() > 2 {
         match Stemmer::new(word) {
             Ok(w) => {
@@ -388,7 +388,7 @@ pub fn get(word: &str) -> Result<~str, ~str> {
             Err(e) => Err(e),
         }
     } else {
-        Ok(word.into_owned())
+        Ok(word.into_string())
     }
 }
 
@@ -408,10 +408,10 @@ mod test {
         let mut result_reader = BufferedReader::new(result);
         loop {
             match input_reader.read_line() {
-                Ok(word) => match get(word.trim()) {
+                Ok(word) => match get(word.as_slice().trim()) {
                     Ok(stem) => {
                         match result_reader.read_line() {
-                            Ok(answer) => if answer.trim() != stem {
+                            Ok(answer) => if answer.as_slice().trim() != stem.as_slice() {
                                 fail!("\n[FAILED] '{:s}' != '{:s}'", stem, answer);
                             } else {
                                 print!(".");
