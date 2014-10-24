@@ -4,21 +4,27 @@ rust-stem
 Porter's stemmer for rust
 
 ## How to use ##
-1. Clone and compile the code
-   ```bash
-   git clone https://github.com/mrordinaire/rust-stem.git
-   cd rust-stem
-   make
-   ```
 
-2. Example code
+1. Add the dependency to your Cargo.toml
+
+    ```toml
+    [dependencies.stem]
+    git = "https://github.com/mrordinaire/rust-stem"
+    ```
+2. Usage
    ```rust
-   use stem::*;
-   let word = "pencils";
-   let s = stem::get(s); // stem == "pencil"
-   ```
+   // lib.rs
+   extern crate stem
 
-3. Compile
-   ```base
-   rustc example.rs -L /path/to/folder/containing/libstem*.so
+   // your code
+   use stem;
+   let word = "pencils"
+   let s = stem::get(word);
+   match s {
+      Ok(stemmed) => println!("{} => {}", word, stemmed),
+      Err(e) => println!("could not stem! reason: {}", e),
+   }
    ```
+3. Compile / Run
+
+   `$ cargo run`
