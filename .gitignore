@@ -1,5 +1,2 @@
-*~
-*.so
-*.swp
-*.rlib
-/stem_test
+Cargo.lock
+target

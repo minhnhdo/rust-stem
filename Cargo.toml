@@ -1,0 +1,8 @@
+[package]
+name = "stem"
+version = "0.1.0"
+authors = ["Do Nhat Minh <mrordinaire@gmail.com>"]
+
+[lib]
+name = "stem"
+
