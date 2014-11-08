@@ -413,14 +413,14 @@ mod test {
                     Ok(stem) => {
                         match result_reader.read_line() {
                             Ok(answer) => if answer.as_slice().trim() != stem.as_slice() {
-                                fail!("\n[FAILED] '{:s}' != '{:s}'", stem, answer);
+                                panic!("\n[FAILED] '{:s}' != '{:s}'", stem, answer);
                             } else {
                                 print!(".");
                             },
                             Err(_) => break,
                         }
                     },
-                    Err(e) => fail!("\n[FAILED] Cannot get stem for '{:s}': {:s}", word, e),
+                    Err(e) => panic!("\n[FAILED] Cannot get stem for '{:s}': {:s}", word, e),
                 },
                 Err(_) => break,
             }
