@@ -1,6 +1,8 @@
 #[cfg(test)] extern crate test;
 
+use std::ascii::AsciiExt;
 use std::borrow::ToOwned;
+use std::str;
 
 /// Member b is a vector of bytes holding a word to be stemmed.
 /// The letters are in b[0], b[1] ... ending at b[z->k]. Member k is readjusted
@@ -19,21 +21,16 @@ use std::borrow::ToOwned;
 ///
 struct Stemmer {
     b: Vec<u8>,
-    k: uint,
-    j: uint
+    k: usize,
+    j: usize
 }
 
 impl Stemmer {
-    fn new(word: &str) -> Result<Stemmer, &str> {
+    fn new(word: &str) -> Result<Stemmer, &'static str> {
         if !word.is_ascii() {
             Err("Only support English words with ASCII characters")
         } else {
-            let b: Vec<u8> = unsafe { 
-                word.to_ascii_nocheck()
-                    .iter()
-                    .map(|c| c.to_lowercase().as_byte())
-                    .collect()
-            };
+            let b = word.to_ascii_lowercase().into_bytes();
             let k = b.len();
             Ok(Stemmer {
                 b: b,
@@ -45,7 +42,7 @@ impl Stemmer {
 
     /// stem.is_consonant(i) is true <=> stem[i] is a consonant
     #[inline]
-    fn is_consonant(&self, i: uint) -> bool {
+    fn is_consonant(&self, i: usize) -> bool {
         match self.b[i] {
             b'a' | b'e' | b'i' | b'o' | b'u' => false,
             b'y' => if i == 0 {
@@ -68,9 +65,9 @@ impl Stemmer {
     ///    <c>vcvcvc<v> gives 3
     ///    ....
     /// ~~~
-    fn measure(&self) -> uint {
-        let mut n = 0u;
-        let mut i = 0u;
+    fn measure(&self) -> usize {
+        let mut n = 0;
+        let mut i = 0;
         let j = self.j;
         loop {
             if i >= j { return n }
@@ -97,7 +94,7 @@ impl Stemmer {
 
     /// stem.has_vowel() is TRUE <=> [0, j-1) contains a vowel
     fn has_vowel(&self) -> bool {
-        for i in range(0, self.j) {
+        for i in 0..self.j {
             if !self.is_consonant(i) {
                 return true;
             }
@@ -107,7 +104,7 @@ impl Stemmer {
 
     /// stem.double_consonant(i) is TRUE <=> i,(i-1) contain a double consonant.
     #[inline]
-    fn double_consonant(&self, i: uint) -> bool {
+    fn double_consonant(&self, i: usize) -> bool {
         if i < 1 {
             false
         } else if self.b[i] != self.b[i - 1] {
@@ -125,11 +122,11 @@ impl Stemmer {
     ///    cav(e), lov(e), hop(e), crim(e), but
     ///    snow, box, tray.
     /// ~~~
-    fn cvc(&self, i: uint) -> bool {
-        if i < 2 
-            || !self.is_consonant(i) 
+    fn cvc(&self, i: usize) -> bool {
+        if i < 2
+            || !self.is_consonant(i)
             || self.is_consonant(i - 1)
-            || !self.is_consonant(i - 2) 
+            || !self.is_consonant(i - 2)
         {
             false
         } else {
@@ -147,7 +144,7 @@ impl Stemmer {
         if len > self.k {
             false
         } else {
-            if self.b.slice(self.k - len, self.k) == s {
+            if &self.b[self.k - len..self.k] == s {
                 self.j = self.k - len;
                 true
             } else {
@@ -161,8 +158,8 @@ impl Stemmer {
     fn set_to(&mut self, s: &str) {
         let s = s.as_bytes();
         let len = s.len();
-        for i in range(0, len) {
-            self.b.as_mut_slice()[self.j + i] = s[i];
+        for i in 0..(len) {
+            self.b[self.j + i] = s[i];
         }
         self.k = self.j + len;
     }
@@ -334,7 +331,7 @@ impl Stemmer {
                 else { return }
             }
             b'o' => {
-                if self.ends("ion") && 
+                if self.ends("ion") &&
                     (self.b[self.j - 1] == b's' || self.b[self.j - 1] == b't') {}
                 else if self.ends("ou") {}
                 else { return }
@@ -374,9 +371,9 @@ impl Stemmer {
             let a = self.measure();
             if a > 1 || a == 1 && !self.cvc(self.k - 2) { self.k -= 1 }
         }
-        if self.b[self.k - 1] == b'l' && 
-            self.double_consonant(self.k - 1) && 
-            self.measure() > 1 
+        if self.b[self.k - 1] == b'l' &&
+            self.double_consonant(self.k - 1) &&
+            self.measure() > 1
         {
             self.k -= 1;
         }
@@ -384,7 +381,9 @@ impl Stemmer {
 
     #[inline]
     fn get(&self) -> String {
-        unsafe { String::from_raw_buf_len(self.b.slice_to(self.k).as_ptr(), self.k) }
+        unsafe {
+            str::from_utf8_unchecked(&self.b[..self.k]).to_owned()
+        }
     }
 }
 
@@ -417,11 +416,11 @@ mod test_stem {
     pub static RESULT: &'static str = include_str!("../test-data/output.txt");
 
     fn test_loop<
-        's, 
-        I0: Iterator<T>, 
-        I1: Iterator<T>, 
+        's,
+        I0: Iterator<T>,
+        I1: Iterator<T>,
         T: Deref<str>>(
-        tests: I0, 
+        tests: I0,
         results: I1
     ) {
         for (test, expect) in tests.zip(results) {
