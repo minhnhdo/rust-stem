@@ -1,3 +1,4 @@
+#![cfg_attr(test, feature(test))]
 #[cfg(test)] extern crate test;
 
 use std::ascii::AsciiExt;
@@ -228,7 +229,7 @@ impl Stemmer {
     /// stem.step1c() turns terminal y to i when there is another vowel in the stem.
     fn step1c(&mut self) {
         if self.ends("y") && self.has_vowel() {
-           self.b.as_mut_slice()[self.k - 1] = b'i';
+           self.b[self.k - 1] = b'i';
         }
     }
 
@@ -411,23 +412,26 @@ pub fn get(word: &str) -> Result<String, &str> {
 mod test_stem {
     use super::get;
     use test::Bencher;
+    use std::ops::Deref;
 
     pub static INPUT: &'static str  = include_str!("../test-data/voc.txt");
     pub static RESULT: &'static str = include_str!("../test-data/output.txt");
 
     fn test_loop<
         's,
-        I0: Iterator<T>,
-        I1: Iterator<T>,
-        T: Deref<str>>(
+        I0: Iterator<Item = T>,
+        I1: Iterator<Item = T>,
+        T: Deref<Target = str>>(
         tests: I0,
         results: I1
     ) {
         for (test, expect) in tests.zip(results) {
-            let stemmed = get(test.trim_right_chars('\r'));
+            let test = test.trim_right();
+            let expect = expect.trim_right();
+            let stemmed = get(test.trim_right());
 
-            assert!(stemmed.is_ok(), "[FAILED] Expected stem for '{}'", test.trim_right_chars('\r'));
-            assert_eq!(stemmed.unwrap().trim_right_chars('\r'), expect.trim_right_chars('\r'));
+            assert!(stemmed.is_ok(), "[FAILED] Expected stem for '{}'", test);
+            assert_eq!(stemmed.unwrap().trim_right(), expect);
         }
     }
 
@@ -445,7 +449,7 @@ mod test_stem {
 
         b.iter(|| {
             for t in input_v.iter() {
-                let stemmed = get(t.trim_right_chars('\r'));
+                let stemmed = get(t.trim_right());
 
                 assert!(stemmed.is_ok());
             }
