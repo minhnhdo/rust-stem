@@ -9,7 +9,7 @@ Porter's stemmer for rust
 
     ```toml
     [dependencies.stem]
-    git = "https://github.com/mrordinaire/rust-stem"
+    git = "https://github.com/minhnhdo/rust-stem"
     ```
 2. Usage
    ```rust
