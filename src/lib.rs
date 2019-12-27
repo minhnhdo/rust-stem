@@ -9,8 +9,8 @@ use std::str;
 /// downwards as the stemming progresses. Zero termination is not in fact used
 /// in the algorithm.
 ///
-/// Note that only lower case sequences are stemmed. Forcing to lower case
-/// should be done before get(...) is called.
+/// Note that only lower case sequences are stemmed. get(...) automatically
+/// lowercases the string before processing.
 ///
 ///
 /// Typical usage is:
