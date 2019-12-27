@@ -1,8 +1,7 @@
 #![cfg_attr(test, feature(test))]
-#[cfg(test)] extern crate test;
+#[cfg(test)]
+extern crate test;
 
-use std::ascii::AsciiExt;
-use std::borrow::ToOwned;
 use std::str;
 
 /// Member b is a vector of bytes holding a word to be stemmed.
@@ -23,7 +22,7 @@ use std::str;
 struct Stemmer {
     b: Vec<u8>,
     k: usize,
-    j: usize
+    j: usize,
 }
 
 impl Stemmer {
@@ -33,11 +32,7 @@ impl Stemmer {
         } else {
             let b = word.to_ascii_lowercase().into_bytes();
             let k = b.len();
-            Ok(Stemmer {
-                b: b,
-                k: k,
-                j: 0
-            })
+            Ok(Stemmer { b: b, k: k, j: 0 })
         }
     }
 
@@ -46,12 +41,14 @@ impl Stemmer {
     fn is_consonant(&self, i: usize) -> bool {
         match self.b[i] {
             b'a' | b'e' | b'i' | b'o' | b'u' => false,
-            b'y' => if i == 0 {
-                true
-            } else {
-                !self.is_consonant(i - 1)
-            },
-            _ => true
+            b'y' => {
+                if i == 0 {
+                    true
+                } else {
+                    !self.is_consonant(i - 1)
+                }
+            }
+            _ => true,
         }
     }
 
@@ -71,22 +68,34 @@ impl Stemmer {
         let mut i = 0;
         let j = self.j;
         loop {
-            if i >= j { return n }
-            if !self.is_consonant(i) { break }
+            if i >= j {
+                return n;
+            }
+            if !self.is_consonant(i) {
+                break;
+            }
             i += 1;
         }
         i += 1;
         loop {
             loop {
-                if i >= j { return n }
-                if self.is_consonant(i) { break }
+                if i >= j {
+                    return n;
+                }
+                if self.is_consonant(i) {
+                    break;
+                }
                 i += 1;
             }
             i += 1;
             n += 1;
             loop {
-                if i >= j { return n }
-                if !self.is_consonant(i) { break }
+                if i >= j {
+                    return n;
+                }
+                if !self.is_consonant(i) {
+                    break;
+                }
                 i += 1;
             }
             i += 1;
@@ -124,16 +133,12 @@ impl Stemmer {
     ///    snow, box, tray.
     /// ~~~
     fn cvc(&self, i: usize) -> bool {
-        if i < 2
-            || !self.is_consonant(i)
-            || self.is_consonant(i - 1)
-            || !self.is_consonant(i - 2)
-        {
+        if i < 2 || !self.is_consonant(i) || self.is_consonant(i - 1) || !self.is_consonant(i - 2) {
             false
         } else {
             match self.b[i] {
                 b'w' | b'x' | b'y' => false,
-                _ => true
+                _ => true,
             }
         }
     }
@@ -205,7 +210,9 @@ impl Stemmer {
             }
         }
         if self.ends("eed") {
-            if self.measure() > 0 { self.k -= 1 }
+            if self.measure() > 0 {
+                self.k -= 1
+            }
         } else if (self.ends("ed") || self.ends("ing")) && self.has_vowel() {
             self.k = self.j;
             if self.ends("at") {
@@ -218,7 +225,7 @@ impl Stemmer {
                 self.k -= 1;
                 match self.b[self.k - 1] {
                     b'l' | b's' | b'z' => self.k += 1,
-                    _ => ()
+                    _ => (),
                 }
             } else if self.measure() == 1 && self.cvc(self.k - 1) {
                 self.set_to("e");
@@ -229,7 +236,7 @@ impl Stemmer {
     /// stem.step1c() turns terminal y to i when there is another vowel in the stem.
     fn step1c(&mut self) {
         if self.ends("y") && self.has_vowel() {
-           self.b[self.k - 1] = b'i';
+            self.b[self.k - 1] = b'i';
         }
     }
 
@@ -239,45 +246,112 @@ impl Stemmer {
     fn step2(&mut self) {
         match self.b[self.k - 2] {
             b'a' => {
-                if self.ends("ational") { self.r("ate"); return }
-                if self.ends("tional") { self.r("tion"); return }
+                if self.ends("ational") {
+                    self.r("ate");
+                    return;
+                }
+                if self.ends("tional") {
+                    self.r("tion");
+                    return;
+                }
             }
             b'c' => {
-                if self.ends("enci") { self.r("ence"); return }
-                if self.ends("anci") { self.r("ance"); return }
+                if self.ends("enci") {
+                    self.r("ence");
+                    return;
+                }
+                if self.ends("anci") {
+                    self.r("ance");
+                    return;
+                }
             }
-            b'e' => if self.ends("izer") { self.r("ize"); return },
+            b'e' => {
+                if self.ends("izer") {
+                    self.r("ize");
+                    return;
+                }
+            }
             b'l' => {
-                if self.ends("bli") { self.r("ble"); return } /*-DEPARTURE-*/
+                if self.ends("bli") {
+                    self.r("ble");
+                    return;
+                } /*-DEPARTURE-*/
 
-             /* To match the published algorithm, replace this line with
+                /* To match the published algorithm, replace this line with
                 'l' => {
                     if self.ends("abli") { self.r("able"); return } */
 
-                if self.ends("alli") { self.r("al"); return }
-                if self.ends("entli") { self.r("ent"); return }
-                if self.ends("eli") { self.r("e"); return }
-                if self.ends("ousli") { self.r("ous"); return }
+                if self.ends("alli") {
+                    self.r("al");
+                    return;
+                }
+                if self.ends("entli") {
+                    self.r("ent");
+                    return;
+                }
+                if self.ends("eli") {
+                    self.r("e");
+                    return;
+                }
+                if self.ends("ousli") {
+                    self.r("ous");
+                    return;
+                }
             }
             b'o' => {
-                if self.ends("ization") { self.r("ize"); return }
-                if self.ends("ation") { self.r("ate"); return }
-                if self.ends("ator") { self.r("ate"); return }
+                if self.ends("ization") {
+                    self.r("ize");
+                    return;
+                }
+                if self.ends("ation") {
+                    self.r("ate");
+                    return;
+                }
+                if self.ends("ator") {
+                    self.r("ate");
+                    return;
+                }
             }
             b's' => {
-                if self.ends("alism") { self.r("al"); return }
-                if self.ends("iveness") { self.r("ive"); return }
-                if self.ends("fulness") { self.r("ful"); return }
-                if self.ends("ousness") { self.r("ous"); return }
+                if self.ends("alism") {
+                    self.r("al");
+                    return;
+                }
+                if self.ends("iveness") {
+                    self.r("ive");
+                    return;
+                }
+                if self.ends("fulness") {
+                    self.r("ful");
+                    return;
+                }
+                if self.ends("ousness") {
+                    self.r("ous");
+                    return;
+                }
             }
             b't' => {
-                if self.ends("aliti") { self.r("al"); return }
-                if self.ends("iviti") { self.r("ive"); return }
-                if self.ends("biliti") { self.r("ble"); return }
+                if self.ends("aliti") {
+                    self.r("al");
+                    return;
+                }
+                if self.ends("iviti") {
+                    self.r("ive");
+                    return;
+                }
+                if self.ends("biliti") {
+                    self.r("ble");
+                    return;
+                }
             }
-            b'g' => if self.ends("logi") { self.r("log"); return }, /*-DEPARTURE-*/
-             /* To match the published algorithm, delete this line */
-            _ => ()
+            b'g' => {
+                if self.ends("logi") {
+                    self.r("log");
+                    return;
+                }
+            } /*-DEPARTURE-*/
+            /* To match the published algorithm, delete this line */
+            _ => (),
         }
     }
 
@@ -285,17 +359,42 @@ impl Stemmer {
     fn step3(&mut self) {
         match self.b[self.k - 1] {
             b'e' => {
-                if self.ends("icate") { self.r("ic"); return }
-                if self.ends("ative") { self.r(""); return }
-                if self.ends("alize") { self.r("al"); return }
+                if self.ends("icate") {
+                    self.r("ic");
+                    return;
+                }
+                if self.ends("ative") {
+                    self.r("");
+                    return;
+                }
+                if self.ends("alize") {
+                    self.r("al");
+                    return;
+                }
             }
-            b'i' => if self.ends("iciti") { self.r("ic"); return },
+            b'i' => {
+                if self.ends("iciti") {
+                    self.r("ic");
+                    return;
+                }
+            }
             b'l' => {
-                if self.ends("ical") { self.r("ic"); return }
-                if self.ends("ful") { self.r(""); return }
+                if self.ends("ical") {
+                    self.r("ic");
+                    return;
+                }
+                if self.ends("ful") {
+                    self.r("");
+                    return;
+                }
             }
-            b's' => if self.ends("ness") { self.r(""); return },
-            _ => ()
+            b's' => {
+                if self.ends("ness") {
+                    self.r("");
+                    return;
+                }
+            }
+            _ => (),
         }
     }
 
@@ -303,65 +402,90 @@ impl Stemmer {
     fn step4(&mut self) {
         match self.b[self.k - 2] {
             b'a' => {
-                if self.ends("al") {}
-                else { return }
+                if self.ends("al") {
+                } else {
+                    return;
+                }
             }
             b'c' => {
-                if self.ends("ance") {}
-                else if self.ends("ence") {}
-                else { return }
+                if self.ends("ance") {
+                } else if self.ends("ence") {
+                } else {
+                    return;
+                }
             }
             b'e' => {
-                if self.ends("er") {}
-                else { return }
+                if self.ends("er") {
+                } else {
+                    return;
+                }
             }
             b'i' => {
-                if self.ends("ic") {}
-                else { return }
+                if self.ends("ic") {
+                } else {
+                    return;
+                }
             }
             b'l' => {
-                if self.ends("able") {}
-                else if self.ends("ible") {}
-                else { return }
+                if self.ends("able") {
+                } else if self.ends("ible") {
+                } else {
+                    return;
+                }
             }
             b'n' => {
-                if self.ends("ant") {}
-                else if self.ends("ement") {}
-                else if self.ends("ment") {}
-                else if self.ends("ent") {}
-                else { return }
+                if self.ends("ant") {
+                } else if self.ends("ement") {
+                } else if self.ends("ment") {
+                } else if self.ends("ent") {
+                } else {
+                    return;
+                }
             }
             b'o' => {
-                if self.ends("ion") &&
-                    (self.b[self.j - 1] == b's' || self.b[self.j - 1] == b't') {}
-                else if self.ends("ou") {}
-                else { return }
+                if self.ends("ion") && (self.b[self.j - 1] == b's' || self.b[self.j - 1] == b't') {
+                } else if self.ends("ou") {
+                } else {
+                    return;
+                }
                 /* takes care of -ous */
             }
             b's' => {
-                if self.ends("ism") {}
-                else { return }
+                if self.ends("ism") {
+                } else {
+                    return;
+                }
             }
             b't' => {
-                if self.ends("ate") {}
-                else if self.ends("iti") {}
-                else { return }
+                if self.ends("ate") {
+                } else if self.ends("iti") {
+                } else {
+                    return;
+                }
             }
             b'u' => {
-                if self.ends("ous") {}
-                else { return }
+                if self.ends("ous") {
+                } else {
+                    return;
+                }
             }
             b'v' => {
-                if self.ends("ive") {}
-                else { return }
+                if self.ends("ive") {
+                } else {
+                    return;
+                }
             }
             b'z' => {
-                if self.ends("ize") {}
-                else { return }
+                if self.ends("ize") {
+                } else {
+                    return;
+                }
             }
-            _ => return
+            _ => return,
         }
-        if self.measure() > 1 { self.k = self.j }
+        if self.measure() > 1 {
+            self.k = self.j
+        }
     }
 
     /// stem.step5() removes a final -e if self.measure() > 0, and changes -ll
@@ -370,21 +494,18 @@ impl Stemmer {
         self.j = self.k;
         if self.b[self.k - 1] == b'e' {
             let a = self.measure();
-            if a > 1 || a == 1 && !self.cvc(self.k - 2) { self.k -= 1 }
+            if a > 1 || a == 1 && !self.cvc(self.k - 2) {
+                self.k -= 1
+            }
         }
-        if self.b[self.k - 1] == b'l' &&
-            self.double_consonant(self.k - 1) &&
-            self.measure() > 1
-        {
+        if self.b[self.k - 1] == b'l' && self.double_consonant(self.k - 1) && self.measure() > 1 {
             self.k -= 1;
         }
     }
 
     #[inline]
     fn get(&self) -> String {
-        unsafe {
-            str::from_utf8_unchecked(&self.b[..self.k]).to_owned()
-        }
+        unsafe { str::from_utf8_unchecked(&self.b[..self.k]).to_owned() }
     }
 }
 
@@ -411,27 +532,23 @@ pub fn get(word: &str) -> Result<String, &str> {
 #[cfg(test)]
 mod test_stem {
     use super::get;
-    use test::Bencher;
     use std::ops::Deref;
+    use test::Bencher;
 
-    pub static INPUT: &'static str  = include_str!("../test-data/voc.txt");
+    pub static INPUT: &'static str = include_str!("../test-data/voc.txt");
     pub static RESULT: &'static str = include_str!("../test-data/output.txt");
 
-    fn test_loop<
-        's,
-        I0: Iterator<Item = T>,
-        I1: Iterator<Item = T>,
-        T: Deref<Target = str>>(
+    fn test_loop<'s, I0: Iterator<Item = T>, I1: Iterator<Item = T>, T: Deref<Target = str>>(
         tests: I0,
-        results: I1
+        results: I1,
     ) {
         for (test, expect) in tests.zip(results) {
-            let test = test.trim_right();
-            let expect = expect.trim_right();
-            let stemmed = get(test.trim_right());
+            let test = test.trim_end();
+            let expect = expect.trim_end();
+            let stemmed = get(test.trim_end());
 
             assert!(stemmed.is_ok(), "[FAILED] Expected stem for '{}'", test);
-            assert_eq!(stemmed.unwrap().trim_right(), expect);
+            assert_eq!(stemmed.unwrap().trim_end(), expect);
         }
     }
 
@@ -449,7 +566,7 @@ mod test_stem {
 
         b.iter(|| {
             for t in input_v.iter() {
-                let stemmed = get(t.trim_right());
+                let stemmed = get(t.trim_end());
 
                 assert!(stemmed.is_ok());
             }
