@@ -13,11 +13,6 @@ Porter's stemmer for rust
     ```
 2. Usage
    ```rust
-   // lib.rs
-   extern crate stem
-
-   // your code
-   use stem;
    let word = "pencils"
    let s = stem::get(word);
    match s {
