@@ -451,7 +451,8 @@ impl Stemmer {
                 }
             }
             b'o' => {
-                if self.ends("ion") && (self.b[self.j - 1] == b's' || self.b[self.j - 1] == b't') {
+                // prevent subtract with overflow
+                if self.ends("ion") && self.j > 1 && (self.b[self.j - 1] == b's' || self.b[self.j - 1] == b't') {
                 } else if self.ends("ou") {
                 } else {
                     return;
