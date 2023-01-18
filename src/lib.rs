@@ -244,6 +244,10 @@ impl Stemmer {
     /// plus -ation) maps to -ize etc. note that the string before the suffix
     /// must give m(z) > 0.
     fn step2(&mut self) {
+        // prevent subtract with overflow
+        if self.k < 2 {
+            return;
+        }
         match self.b[self.k - 2] {
             b'a' => {
                 if self.ends("ational") {
@@ -400,6 +404,10 @@ impl Stemmer {
 
     /// stem.step4() takes off -ant, -ence etc., in context <c>vcvc<v>.
     fn step4(&mut self) {
+        // prevent subtract with overflow
+        if self.k < 2 {
+            return;
+        }
         match self.b[self.k - 2] {
             b'a' => {
                 if self.ends("al") {
